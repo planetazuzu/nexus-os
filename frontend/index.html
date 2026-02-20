@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS OS — Command Center</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+        
+        :root {
+            --bg: #080b14;
+            --surface: #0d1220;
+            --surface2: #131929;
+            --border: #1e2d4a;
+            --border2: #2a3d5e;
+            --accent: #00d4ff;
+            --accent2: #7c3aed;
+            --accent3: #10b981;
+            --accent4: #f59e0b;
+            --accent5: #ef4444;
+            --text: #e2eaf5;
+            --text2: #7a9bbf;
+            --text3: #4a6080;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            min-height: 100vh;
+        }
+        
+        /* Login */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .login-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .login-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--accent);
+            text-align: center;
+            margin-bottom: 8px;
+            letter-spacing: 3px;
+        }
+        
+        .login-subtitle {
+            color: var(--text2);
+            text-align: center;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            color: var(--text2);
+            font-size: 12px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent);
+            color: var(--bg);
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn:hover {
+            background: #00b8e0;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+        
+        .error-msg {
+            color: var(--accent5);
+            text-align: center;
+            margin-top: 16px;
+            font-size: 13px;
+            display: none;
+        }
+        
+        /* Dashboard */
+        .dashboard { display: none; }
+        
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 52px;
+            background: rgba(8, 11, 20, 0.95);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 24px;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+        
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 16px;
+            color: var(--accent);
+            letter-spacing: 3px;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 2px;
+            flex: 1;
+        }
+        
+        .nav-tab {
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            color: var(--text2);
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        
+        .nav-tab:hover { color: var(--text); background: var(--surface); }
+        .nav-tab.active {
+            color: var(--accent);
+            background: rgba(0, 212, 255, 0.08);
+            border-color: rgba(0, 212, 255, 0.2);
+        }
+        
+        .main {
+            margin-top: 52px;
+            padding: 20px;
+        }
+        
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 1024px) {
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        @media (max-width: 600px) {
+            .grid-4 { grid-template-columns: 1fr; }
+            .nav-tabs { display: none; }
+        }
+        
+        .kpi-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 18px;
+            position: relative;
+        }
+        
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+        }
+        
+        .kpi-label {
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            color: var(--text3);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        
+        .kpi-value {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 28px;
+            color: var(--accent);
+        }
+        
+        .kpi-sub {
+            font-size: 11px;
+            color: var(--text3);
+            margin-top: 4px;
+        }
+        
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+        
+        .card-title {
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text2);
+            margin-bottom: 14px;
+        }
+        
+        .agent-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--surface2);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .agent-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            background: rgba(0, 212, 255, 0.1);
+        }
+        
+        .agent-info { flex: 1; }
+        .agent-name { font-weight: 600; font-size: 13px; }
+        .agent-role { font-size: 11px; color: var(--text3); }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent3);
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.offline { background: var(--accent5); animation: none; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .task-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent3);
+        }
+        
+        .task-status.pending { background: var(--text3); }
+        .task-status.running { background: var(--accent); animation: pulse 1.5s infinite; }
+        
+        .task-name { flex: 1; font-size: 12px; }
+        .task-agent { font-size: 10px; color: var(--text3); }
+    </style>
+</head>
+<body>
+    <!-- Login -->
+    <div class="login-container" id="login">
+        <div class="login-box">
+            <div class="login-title">NEXUS OS</div>
+            <div class="login-subtitle">Sistema de Agentes IA</div>
+            <form id="loginForm">
+                <div class="input-group">
+                    <label>Token de Acceso</label>
+                    <input type="password" id="tokenInput" placeholder="Introduce tu token" required>
+                </div>
+                <button type="submit" class="btn">Acceder</button>
+            </form>
+            <div class="error-msg" id="errorMsg">Token incorrecto</div>
+        </div>
+    </div>
+    
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+        <div class="topbar">
+            <div class="logo">NEXUS OS</div>
+            <div class="nav-tabs">
+                <div class="nav-tab active">Overview</div>
+                <div class="nav-tab">Agentes</div>
+                <div class="nav-tab">Tareas</div>
+                <div class="nav-tab">Comms</div>
+                <div class="nav-tab">Docs</div>
+            </div>
+        </div>
+        
+        <div class="main">
+            <!-- KPIs -->
+            <div class="grid-4" id="kpis">
+                <div class="kpi-card">
+                    <div class="kpi-label">Tareas Hoy</div>
+                    <div class="kpi-value" id="kpi-tasks">--</div>
+                    <div class="kpi-sub">+3 desde ayer</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Emails</div>
+                    <div class="kpi-value" id="kpi-emails">--</div>
+                    <div class="kpi-sub">Procesados hoy</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Uptime</div>
+                    <div class="kpi-value" id="kpi-uptime">--</div>
+                    <div class="kpi-sub">Sistema estable</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Coste</div>
+                    <div class="kpi-value" id="kpi-cost">0€</div>
+                    <div class="kpi-sub">Solo modelos gratis</div>
+                </div>
+            </div>
+            
+            <!-- Agents -->
+            <div class="card">
+                <div class="card-title">🤖 Agentes</div>
+                <div id="agents-list"></div>
+            </div>
+            
+            <!-- Tasks -->
+            <div class="card">
+                <div class="card-title">📋 Tareas Pendientes</div>
+                <div id="tasks-list"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = '/api';
+        let token = localStorage.getItem('nexus_token');
+        
+        // Check if already logged in
+        if (token) {
+            showDashboard();
+        }
+        
+        // Login form
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const inputToken = document.getElementById('tokenInput').value;
+            
+            try {
+                const res = await fetch(`${API_URL}/health`, {
+                    headers: { 'Authorization': `Bearer ${inputToken}` }
+                });
+                
+                if (res.ok) {
+                    token = inputToken;
+                    localStorage.setItem('nexus_token', token);
+                    showDashboard();
+                } else {
+                    document.getElementById('errorMsg').style.display = 'block';
+                }
+            } catch (err) {
+                document.getElementById('errorMsg').textContent = 'Error de conexión';
+                document.getElementById('errorMsg').style.display = 'block';
+            }
+        });
+        
+        function showDashboard() {
+            document.getElementById('login').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            loadData();
+        }
+        
+        async function loadData() {
+            try {
+                // Load KPIs
+                const kpisRes = await fetch(`${API_URL}/kpis`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const kpis = await kpisRes.json();
+                
+                document.getElementById('kpi-tasks').textContent = kpis.find(k => k.id === 'tasks')?.value || '--';
+                document.getElementById('kpi-emails').textContent = kpis.find(k => k.id === 'emails')?.value || '--';
+                document.getElementById('kpi-uptime').textContent = kpis.find(k => k.id === 'uptime')?.value + '%' || '--';
+                document.getElementById('kpi-cost').textContent = kpis.find(k => k.id === 'cost')?.value + '€' || '0€';
+                
+                // Load Agents
+                const agentsRes = await fetch(`${API_URL}/agents`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const agents = await agentsRes.json();
+                
+                const agentsList = document.getElementById('agents-list');
+                agentsList.innerHTML = agents.map(agent => `
+                    <div class="agent-card">
+                        <div class="agent-avatar">${agent.name[0]}</div>
+                        <div class="agent-info">
+                            <div class="agent-name">${agent.name}</div>
+                            <div class="agent-role">${agent.role}</div>
+                        </div>
+                        <div class="status-dot ${agent.status === 'offline' ? 'offline' : ''}"></div>
+                    </div>
+                `).join('');
+                
+                // Load Tasks
+                const tasksRes = await fetch(`${API_URL}/tasks`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const tasks = await tasksRes.json();
+                
+                const tasksList = document.getElementById('tasks-list');
+                tasksList.innerHTML = tasks.map(task => `
+                    <div class="task-item">
+                        <div class="task-status ${task.status}"></div>
+                        <div class="task-name">${task.name}</div>
+                        <div class="task-agent">${task.agent}</div>
+                    </div>
+                `).join('');
+                
+            } catch (err) {
+                console.error('Error loading data:', err);
+            }
+        }
+        
+        // Refresh every 30 seconds
+        setInterval(loadData, 30000);
+    </script>
+</body>
+</html>
